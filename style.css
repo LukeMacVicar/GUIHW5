@@ -1,0 +1,470 @@
+/* Scrabble Game Styles - Luke MacVicar - GUI Programming HW5 - Dec 2025 */
+
+:root {
+    /* Earthy Palette */
+    --color-page-bg: #2b3328;
+    --color-text-light: #e8dfcc;
+
+    /* Color Accents */
+    --color-primary: #c17c59;
+    --color-secondary: #7e8d50;
+    --color-accent: #d4a045;
+
+    /* Board Styling */
+    --color-board-border: #3e2723;
+    --color-board-shadow: rgba(0, 0, 0, 0.6);
+
+    /* Rack */
+    --color-rack-bg: #4a3728;
+    --color-rack-light: #5d4835;
+    --color-rack-dark: #3a281a;
+
+    /* Sizing */
+    --board-size: min(85vw, 580px);
+    --square-size: calc(var(--board-size) / 15);
+    --tile-size: 48px;
+    --border-radius: 2px;
+}
+
+/* Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Garamond', 'Georgia', serif;
+    background-color: var(--color-page-bg);
+    color: var(--color-text-light);
+    min-height: 100vh;
+    padding: 16px;
+}
+
+/* Game Container */
+.game-container {
+    max-width: 750px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+/* Header & Score Panel */
+.game-header {
+    width: 100%;
+    text-align: center;
+}
+
+.game-header h1 {
+    font-family: 'Times New Roman', serif;
+    font-size: 3rem;
+    font-weight: normal;
+    font-style: italic;
+    color: var(--color-accent);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--color-accent);
+    display: inline-block;
+    padding-bottom: 10px;
+}
+
+.score-panel {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.score-item {
+    background: rgba(62, 39, 35, 0.6);
+    padding: 12px 24px;
+    border-radius: 2px;
+    border: 1px solid var(--color-rack-light);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 100px;
+}
+
+.score-label {
+    font-family: 'Garamond', serif;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #a89f91;
+    margin-bottom: 4px;
+}
+
+.score-value {
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--color-text-light);
+}
+
+/* Game Messages */
+.game-message {
+    padding: 12px 24px;
+    border-radius: 2px;
+    font-family: 'Garamond', serif;
+    font-size: 1.1rem;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    animation: fadeIn 0.5s ease;
+    border: 1px solid transparent;
+}
+
+.game-message.hidden {
+    display: none;
+}
+
+.game-message.success {
+    background: rgba(126, 141, 80, 0.2);
+    border-color: var(--color-secondary);
+    color: #aebf85;
+}
+
+.game-message.error {
+    background: rgba(193, 124, 89, 0.2);
+    border-color: var(--color-primary);
+    color: #e6b29e;
+}
+
+.game-message.info {
+    background: rgba(212, 160, 69, 0.1);
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Board */
+.board-wrapper {
+    background: #1a1510;
+    padding: 10px;
+    border-radius: 4px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    border: 4px solid var(--color-board-border);
+}
+
+#scrabble-board {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    grid-template-rows: repeat(15, 1fr);
+    grid-gap: 3px;
+
+    box-sizing: border-box;
+
+    width: 680px;
+    height: 680px;
+    background-image: url('graphics_data/ScrabbleBoard.jpg');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    padding-left: 95px;
+    padding-top: 53px;
+    padding-right: 56px;
+    padding-bottom: 50px;
+
+    border-radius: 2px;
+    position: relative;
+    z-index: 10;
+    filter: sepia(0.3) contrast(1.1);
+}
+
+.board-square {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.board-square::before {
+    content: attr(data-label);
+    color: transparent;
+}
+
+.board-square.center,
+.board-square.double-letter,
+.board-square.triple-letter,
+.board-square.double-word,
+.board-square.triple-word {
+    background-color: transparent;
+}
+
+.board-square.center::before,
+.board-square.double-letter::before,
+.board-square.triple-letter::before,
+.board-square.double-word::before,
+.board-square.triple-word::before {
+    color: transparent;
+}
+
+/* Drop Highlighting */
+.board-square.ui-droppable-hover {
+    transform: scale(1.0);
+    box-shadow: inset 0 0 15px var(--color-accent);
+    z-index: 10;
+    background-color: rgba(212, 160, 69, 0.2);
+}
+
+.board-square.occupied::before {
+    display: none;
+}
+
+/* Tiles */
+.tile {
+    width: var(--tile-size);
+    height: var(--tile-size);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: grab;
+    position: relative;
+    user-select: none;
+    z-index: 100;
+
+    /* Shadow */
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.4));
+}
+
+.tile:hover {
+    transform: translateY(-2px);
+    filter: drop-shadow(4px 4px 6px rgba(0, 0, 0, 0.5));
+    z-index: 1000;
+}
+
+.tile:active {
+    cursor: grabbing;
+}
+
+.tile .tile-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+.tile.ui-draggable-dragging {
+    z-index: 1000;
+    filter: drop-shadow(5px 5px 10px rgba(0, 0, 0, 0.6));
+    transform: scale(1.1) rotate(1deg);
+}
+
+/* Tile on board - scale to fit the grid cell */
+.board-square .tile {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+/* Tile Rack */
+#tile-rack {
+    width: 500px;
+    height: 90px;
+    background-image: url('graphics_data/scrabble-tile-holder-406774_640.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding-bottom: 10px;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    min-height: auto;
+    min-width: auto;
+
+    /* Darken rack slightly */
+    filter: brightness(0.9) sepia(0.2);
+}
+
+.rack-wrapper h2 {
+    font-family: 'Garamond', serif;
+    font-size: 1.1rem;
+    color: var(--color-accent);
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 400;
+    border-bottom: 1px solid rgba(212, 160, 69, 0.3);
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.tile-slot {
+    width: var(--tile-size);
+    height: var(--tile-size);
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.btn {
+    padding: 10px 24px;
+    font-family: 'Garamond', serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn span {
+    font-size: 1rem;
+}
+
+/* Submit Button */
+.btn-primary {
+    background-color: var(--color-secondary);
+    color: #1a1a1a;
+    border: 1px solid #5d6b38;
+}
+
+.btn-primary:hover {
+    background-color: #8f9e60;
+    color: #000;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Recall Button */
+.btn-secondary {
+    background-color: var(--color-rack-light);
+    color: var(--color-text-light);
+    border: 1px solid #4a3728;
+}
+
+.btn-secondary:hover {
+    background-color: #6d5440;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+/* New Game Button */
+.btn-danger {
+    background-color: var(--color-primary);
+    color: var(--color-text-light);
+    border: 1px solid #8f563b;
+}
+
+.btn-danger:hover {
+    background-color: #d28c6a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transform: translateY(-1px);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none;
+}
+
+/* Word Display */
+.word-display {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 30px;
+    background: rgba(43, 33, 27, 0.8);
+    border-radius: 2px;
+    border: 1px solid var(--color-board-border);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.word-label {
+    color: #a89f91;
+    font-family: 'Garamond', serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.current-word {
+    font-size: 1.8rem;
+    font-weight: normal;
+    font-family: 'Garamond', serif;
+    font-style: italic;
+    color: var(--color-text-light);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+.word-status {
+    font-family: 'Garamond', serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.word-status.valid {
+    background: rgba(126, 141, 80, 0.1);
+    color: #c4d696;
+    border: 1px solid var(--color-secondary);
+}
+
+.word-status.invalid {
+    background: rgba(193, 124, 89, 0.1);
+    color: #e6b29e;
+    border: 1px solid var(--color-primary);
+}
+
+/* Responsive Design */
+@media (max-width: 620px) {
+    :root {
+        --board-size: 96vw;
+        --tile-size: 38px;
+    }
+
+    .game-header h1 {
+        font-size: 2rem;
+    }
+
+    .score-panel {
+        gap: 12px;
+    }
+
+    .score-item {
+        padding: 8px 16px;
+        min-width: 80px;
+    }
+}
